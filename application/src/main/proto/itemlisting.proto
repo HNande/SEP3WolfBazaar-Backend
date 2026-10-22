@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+package generated;
+
+service ItemListingService {
+  rpc AddItemListing(AddItemListingRequest) returns (ItemListingResponse);
+  rpc GetItemListing(GetItemListingRequest) returns (ItemListingResponse);
+}
+
+// Represents a ItemListing entity in the system.
+message ItemListing {
+  // Unique identifier
+  string id = 1;
+  // Display name of the Item Listing.
+  string name = 2;
+}
+
+// Request message for creating a new item listing.
+message AddItemListingRequest {
+  string name = 1;
+}
+
+// Request message for retrieving an item listing
+message GetItemListingRequest {
+  // ID of the item listing to retrieve.
+  string id = 1;
+}
+
+message ItemListingResponse {
+  // The item listing entity (created or retrieved).
+  ItemListing itemlisting = 1;
+}

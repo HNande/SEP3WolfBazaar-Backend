@@ -7,11 +7,13 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>4.1.1</version>
+
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>org.example</groupId>
     <artifactId>SEP3WolfBazaar-Backend</artifactId>
     <version>0.0.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
     <name>SEP3WolfBazaar</name>
     <description>SEP3WolfBazaar</description>
     <url/>
@@ -21,6 +23,10 @@
     <developers>
         <developer/>
     </developers>
+    <modules>
+        <module>application</module>
+        <module>data</module>
+    </modules>
     <scm>
         <connection/>
         <developerConnection/>
@@ -118,6 +124,7 @@
                             </annotationProcessorPaths>
                         </configuration>
                     </execution>
+
                     <execution>
                         <id>default-testCompile</id>
                         <phase>test-compile</phase>
@@ -132,6 +139,7 @@
                                 </path>
                             </annotationProcessorPaths>
                         </configuration>
+
                     </execution>
                 </executions>
             </plugin>
