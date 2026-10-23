@@ -8,6 +8,6 @@
         <version>0.0.1-SNAPSHOT</version>
     </parent>
     <artifactId>data</artifactId>
-    <name>Archetype - data</name>
+    <name>data</name>
     <url>http://maven.apache.org</url>
 </project>

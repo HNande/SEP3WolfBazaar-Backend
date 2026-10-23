@@ -1,0 +1,68 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+package generated;
+
+service ItemListingService {
+  rpc AddItemListing(AddItemListingRequest) returns (ItemListingResponse);
+  rpc GetItemListing(GetItemListingRequest) returns (ItemListingResponse);
+}
+enum imageFileType{
+  png = 0;
+  jpg = 1;
+}
+enum categories{
+  clothing = 0;
+  accessories = 1;
+  curios = 2;
+}
+// Represents a ItemListing entity in the system.
+message ItemListing {
+  string id = 1;
+  string itemName = 2;
+  string memberName = 3;
+  string description = 4;
+  int32 price = 5;
+  Album album = 6;
+  repeated categories categories = 7;
+
+}
+message UploadImageRequest{
+ Image image = 1;
+}
+
+message UploadSummary {
+  uint32 received_count = 1;
+  uint64 total_bytes = 2;
+}
+
+message Album {
+  string title = 1;
+  repeated Image images = 2;
+}
+message Image {
+  string name = 1;
+  imageFileType filetype = 2;
+  uint32 width = 3;
+  uint32 height = 4;
+  bytes data = 5;
+  map<string, string> metadata = 6;
+  }
+message ImageList {
+  repeated Image images = 1;
+}
+// Request message for creating a new item listing.
+message AddItemListingRequest {
+  ItemListing itemListing = 1;
+}
+
+// Request message for retrieving an item listing
+message GetItemListingRequest {
+  // ID of the item listing to retrieve.
+  string id = 1;
+}
+
+message ItemListingResponse {
+  // The item listing entity (created or retrieved).
+  ItemListing itemlisting = 1;
+}

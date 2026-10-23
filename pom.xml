@@ -26,6 +26,7 @@
     <modules>
         <module>application</module>
         <module>data</module>
+        <module>proto-contract</module>
     </modules>
     <scm>
         <connection/>
