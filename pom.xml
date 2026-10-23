@@ -35,6 +35,9 @@
     </scm>
     <properties>
         <java.version>25</java.version>
+        <protobuf.version>4.28.3</protobuf.version>
+        <grpc.version>1.68.1</grpc.version>
+        <protobuf-maven-plugin.version>...</protobuf-maven-plugin.version>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -115,11 +118,27 @@
     </dependencies>
 
     <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>io.github.ascopes</groupId>
+                    <artifactId>protobuf-maven-plugin</artifactId>
+                    <version>${protobuf-maven-plugin.version}</version>
+                    <configuration>
+                        <protoc>${protobuf.version}</protoc>
+                        <binaryMavenPlugins>
+                            <binaryMavenPlugin>
+                                <groupId>io.grpc</groupId>
+                                <artifactId>protoc-gen-grpc-java</artifactId>
+                                <version>${grpc.version}</version>
+                                <options>@generated=omit</options>
+                            </binaryMavenPlugin>
+                        </binaryMavenPlugins>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
         <plugins>
-            <plugin>
-                <groupId>io.github.ascopes</groupId>
-                <artifactId>protobuf-maven-plugin</artifactId>
-            </plugin>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
