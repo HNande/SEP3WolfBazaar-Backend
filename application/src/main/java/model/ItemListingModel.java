@@ -25,7 +25,4 @@ public interface ItemListingModel {
   void removeItemListingCategory(int id);
   void setItemListingDate(Date date);
 
-
-
-
 }

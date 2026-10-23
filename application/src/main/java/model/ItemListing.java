@@ -4,7 +4,7 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Date;
 
-public class ItemListing implements  ItemListingModel {
+public class ItemListing implements ItemListingModel {
   private int itemId;
   private String itemName;
   private String memberName;
@@ -37,7 +37,7 @@ public class ItemListing implements  ItemListingModel {
     return price;
   }
 
-  public ArrayList<BufferedImage> getItemListingImageList(){
+  public ArrayList<BufferedImage> getItemListingImageList() {
     return new ArrayList<>(images);
   }
 
