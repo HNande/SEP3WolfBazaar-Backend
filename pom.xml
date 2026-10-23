@@ -71,26 +71,6 @@
     </dependencies>
 
     <build>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>io.github.ascopes</groupId>
-                    <artifactId>protobuf-maven-plugin</artifactId>
-                    <version>${protobuf-maven-plugin.version}</version>
-                    <configuration>
-                        <protoc>${protobuf.version}</protoc>
-                        <binaryMavenPlugins>
-                            <binaryMavenPlugin>
-                                <groupId>io.grpc</groupId>
-                                <artifactId>protoc-gen-grpc-java</artifactId>
-                                <version>${grpc.version}</version>
-                                <options>@generated=omit</options>
-                            </binaryMavenPlugin>
-                        </binaryMavenPlugins>
-                    </configuration>
-                </plugin>
-            </plugins>
-        </pluginManagement>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
