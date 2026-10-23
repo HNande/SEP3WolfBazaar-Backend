@@ -1,4 +1,4 @@
-package model;
+package org.example.application.model;
 
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;

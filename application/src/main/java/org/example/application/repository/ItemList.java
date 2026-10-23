@@ -1,6 +1,6 @@
-package repository;
+package org.example.application.repository;
 
-import model.ItemListing;
+import org.example.application.model.ItemListing;
 
 import java.util.ArrayList;
 import java.util.List;

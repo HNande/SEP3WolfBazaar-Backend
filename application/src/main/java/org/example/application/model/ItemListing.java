@@ -1,4 +1,6 @@
-package model;
+package org.example.application.model;
+
+import org.springframework.web.multipart.MultipartFile;
 
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
@@ -12,6 +14,7 @@ public class ItemListing implements ItemListingModel {
   private int price;
   private ArrayList<BufferedImage> images;
   private ArrayList<ItemListingCategory> categories;
+  private MultipartFile[] photos;
 
   public ItemListing(int itemId) {
     this.itemId = itemId;
@@ -37,8 +40,12 @@ public class ItemListing implements ItemListingModel {
     return price;
   }
 
+  public MultipartFile[] getPhotos() {
+    return photos;
+  }
+
   public ArrayList<BufferedImage> getItemListingImageList() {
-    return new ArrayList<>(images);
+    return images != null ? new ArrayList<>(images) : new ArrayList<>();
   }
 
   public BufferedImage getItemListingImageById(int id) {
@@ -62,27 +69,37 @@ public class ItemListing implements ItemListingModel {
   }
 
   public void setItemListingName(String name) {
-
+      this.itemName = name;
   }
 
   public void setItemListingMemberName(String name) {
-
+      this.memberName = name;
   }
 
   public void setItemListingDescription(String description) {
-
+      this.description = description;
   }
 
   public void setItemListingPrice(int price) {
+      this.price = price;
+  }
 
+  public void setPhotos(MultipartFile[] photos) {
+    this.photos = photos;
   }
 
   public void addItemListingImage(BufferedImage image) {
-
+    if (this.images == null) {
+      this.images = new ArrayList<>();
+    }
+    this.images.add(image);
   }
 
   public void addItemListingCategory(ItemListingCategory category) {
-
+    if (this.categories == null) {
+      this.categories = new ArrayList<>();
+    }
+    this.categories.add(category);
   }
 
   public void removeItemListingCategory(int id) {
