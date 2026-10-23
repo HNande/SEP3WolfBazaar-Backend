@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 public class ItemListing implements  ItemListingModel {
-  private final int itemId;
+  private int itemId;
   private String itemName;
   private String memberName;
   private String description;
@@ -58,7 +58,7 @@ public class ItemListing implements  ItemListingModel {
   }
 
   public void setItemListingId(int id) {
-
+    itemId = id;
   }
 
   public void setItemListingName(String name) {
