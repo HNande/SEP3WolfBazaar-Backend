@@ -10,4 +10,6 @@
     <artifactId>proto-contract</artifactId>
     <name>Archetype - proto-contract</name>
     <url>http://maven.apache.org</url>
+
+
 </project>
