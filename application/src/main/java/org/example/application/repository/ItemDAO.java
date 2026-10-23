@@ -1,7 +1,8 @@
-package repository;
+package org.example.application.repository;
 
-import model.ItemListing;
+import org.example.application.model.ItemListing;
 import org.springframework.stereotype.Repository;
+import org.springframework.web.multipart.MultipartFile;
 
 @Repository public class ItemDAO {
   private static ItemList items = new ItemList();
@@ -19,8 +20,9 @@ import org.springframework.stereotype.Repository;
         .findFirst().orElse(null);
   }
 
-  public void addItem(ItemListing item) {
+  public void addItem(ItemListing item, MultipartFile[] photos) {
     item.setItemListingId(items.getItemList().size() + 1);
+    item.setPhotos(photos);
     items.getItemList().add(item);
   }
 }
