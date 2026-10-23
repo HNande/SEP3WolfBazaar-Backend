@@ -10,6 +10,13 @@
     <artifactId>proto-contract</artifactId>
     <name>proto-contract</name>
     <url>http://maven.apache.org</url>
+    <dependencies>
+        <dependency>
+            <groupId>com.google.protobuf</groupId>
+            <artifactId>protobuf-java</artifactId>
+            <version>4.35.1</version>
+        </dependency>
+    </dependencies>
     <build>
         <plugins>
         <plugin>
