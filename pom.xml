@@ -13,7 +13,6 @@
     <artifactId>SEP3WolfBazaar-Backend</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>SEP3WolfBazaar</name>
     <description>SEP3WolfBazaar</description>
     <url/>
     <licenses>

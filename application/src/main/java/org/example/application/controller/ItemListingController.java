@@ -1,6 +1,7 @@
 package org.example.application.controller;
 
-import org.example.application.model.ItemListing;
+import generated.Date;
+import generated.ItemListing;
 import org.example.application.repository.ItemFormDTO;
 import org.example.application.repository.ItemResponseDTO;
 import org.example.application.service.ItemListingService;
@@ -33,15 +34,26 @@ public class ItemListingController {
 
   @PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<ItemResponseDTO> addItem(@ModelAttribute ItemFormDTO form) {
-    ItemListing item = new ItemListing(0);
-    item.setItemListingName(form.getName());
-    item.setItemListingDescription(form.getDescription());
-    item.setItemListingPrice(form.getPrice());
+    ItemListing item =  ItemListing.newBuilder()
+        .setId(form.getId())
+        .setItemName(form.getItemName())
+        .setMemberName(form.getMemberName())
+        .setDescription(form.getDescription())
+        .setPrice(form.getPrice())
+        .setDate(Date.newBuilder()
+            .setYear(form.getYear())
+            .setMonth(form.getMonth())
+            .setDay(form.getDay())
+                .build())
+        .addCategories(form.getCategories())
+        //Bruh
+        .setAlbum(form.getAlbum())
+        .build();
 
-    itemListingService.addItem(item, form.getPhotos());
+    itemListingService.addItem(item, form.getAlbum());
 
     URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-            .path("/{id}").buildAndExpand(item.getItemListingId()).toUri();
+            .path("/{id}").buildAndExpand(item.getId()).toUri();
 
     return ResponseEntity.created(location).body(ItemResponseDTO.from(item));
   }

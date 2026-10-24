@@ -1,6 +1,6 @@
 package org.example.application.service;
 
-import org.example.application.model.ItemListing;
+import generated.ItemListing;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;

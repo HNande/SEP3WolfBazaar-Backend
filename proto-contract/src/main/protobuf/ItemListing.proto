@@ -18,14 +18,14 @@ enum categories{
 }
 // Represents a ItemListing entity in the system.
 message ItemListing {
-  string id = 1;
+  int32 id = 1;
   string itemName = 2;
   string memberName = 3;
   string description = 4;
   int32 price = 5;
   Album album = 6;
   repeated categories categories = 7;
-
+  Date date = 8;
 }
 message UploadImageRequest{
  Image image = 1;
@@ -46,7 +46,11 @@ message Image {
   uint32 width = 3;
   uint32 height = 4;
   bytes data = 5;
-  map<string, string> metadata = 6;
+  }
+  message Date {
+  int32 year = 1;
+  int32 month = 2;
+  int32 day = 3;
   }
 message ImageList {
   repeated Image images = 1;

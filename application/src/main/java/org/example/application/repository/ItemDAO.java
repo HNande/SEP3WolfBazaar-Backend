@@ -1,6 +1,6 @@
 package org.example.application.repository;
 
-import org.example.application.model.ItemListing;
+import generated.ItemListing;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.multipart.MultipartFile;
 
