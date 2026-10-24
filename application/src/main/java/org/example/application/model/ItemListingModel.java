@@ -14,7 +14,7 @@ public interface ItemListingModel {
   BufferedImage getItemListingImageById(int id);
   ArrayList<String> getItemListingCategories();
   String getItemListingCategoryById(int id);
-  Date getItemListingDate();
+  ItemDate getItemListingDate();
   void setItemListingId(int id);
   void setItemListingName(String name);
   void setItemListingMemberName(String name);
@@ -23,6 +23,6 @@ public interface ItemListingModel {
   void addItemListingImage(BufferedImage image);
   void addItemListingCategory(ItemListingCategory category);
   void removeItemListingCategory(int id);
-  void setItemListingDate(Date date);
+  void setItemListingDate(int year,int month,int day);
 
 }

@@ -13,8 +13,9 @@ public class ItemListing implements ItemListingModel {
   private String description;
   private int price;
   private ArrayList<BufferedImage> images;
-  private ArrayList<ItemListingCategory> categories;
+  private ArrayList<ItemListingCategory> categories = new ArrayList<>();
   private MultipartFile[] photos;
+  private ItemDate date;
 
   public ItemListing(int itemId) {
     this.itemId = itemId;
@@ -57,11 +58,11 @@ public class ItemListing implements ItemListingModel {
   }
 
   public String getItemListingCategoryById(int id) {
-    return "";
+    return categories.get(id).toString();
   }
 
-  public Date getItemListingDate() {
-    return null;
+  public ItemDate getItemListingDate() {
+    return date;
   }
 
   public void setItemListingId(int id) {
@@ -96,17 +97,14 @@ public class ItemListing implements ItemListingModel {
   }
 
   public void addItemListingCategory(ItemListingCategory category) {
-    if (this.categories == null) {
-      this.categories = new ArrayList<>();
-    }
     this.categories.add(category);
   }
 
   public void removeItemListingCategory(int id) {
-
+    categories.remove(id);
   }
 
-  public void setItemListingDate(Date date) {
-
+  public void setItemListingDate(int year, int month, int day) {
+    date = new ItemDate(year,month,day);
   }
 }
