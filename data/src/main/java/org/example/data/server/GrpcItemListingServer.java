@@ -1,10 +1,11 @@
-package server;
+package org.example.data.server;
 
 import generated.AddItemListingRequest;
 import generated.ItemListing;
 import generated.ItemListingResponse;
 import generated.ItemListingServiceGrpc;
 import io.grpc.stub.StreamObserver;
+import org.example.data.service.DataItemListingService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.grpc.server.service.GrpcService;
@@ -12,8 +13,8 @@ import org.springframework.grpc.server.service.GrpcService;
 @GrpcService
 public class GrpcItemListingServer extends ItemListingServiceGrpc.ItemListingServiceImplBase {
   private static final Logger LOG = LoggerFactory.getLogger(GrpcItemListingServer.class.getName());
-  private final ItemListingService service;
-  public GrpcItemListingServer(ItemListingService service){
+  private final DataItemListingService service;
+  public GrpcItemListingServer(DataItemListingService service){
     this.service = service;
   }
 
