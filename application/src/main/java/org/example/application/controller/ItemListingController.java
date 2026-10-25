@@ -1,9 +1,9 @@
 package org.example.application.controller;
 
-import generated.Date;
 import generated.ItemListing;
-import org.example.application.repository.ItemFormDTO;
-import org.example.application.repository.ItemResponseDTO;
+import jakarta.validation.Valid;
+import org.example.application.repository.ItemListingJsonDTO;
+import org.example.application.repository.ItemListingResponseDTO;
 import org.example.application.service.ItemListingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -26,44 +26,28 @@ public class ItemListingController {
   }
 
   @GetMapping("")
-  public List<ItemResponseDTO> getItemList() {
+  public List<ItemListingResponseDTO> getItemList() {
     return itemListingService.getItemList().getItemList().stream()
-            .map(ItemResponseDTO::from)
+            .map(ItemListingResponseDTO::from)
             .toList();
   }
 
   @PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-  public ResponseEntity<ItemResponseDTO> addItem(@ModelAttribute ItemFormDTO form) {
-    ItemListing item =  ItemListing.newBuilder()
-        .setId(form.getId())
-        .setItemName(form.getItemName())
-        .setMemberName(form.getMemberName())
-        .setDescription(form.getDescription())
-        .setPrice(form.getPrice())
-        .setDate(Date.newBuilder()
-            .setYear(form.getYear())
-            .setMonth(form.getMonth())
-            .setDay(form.getDay())
-                .build())
-        .addCategories(form.getCategories())
-        //Bruh
-        .setAlbum(form.getAlbum())
-        .build();
-
-    itemListingService.addItem(item, form.getAlbum());
+  public ResponseEntity<ItemListingResponseDTO> addItem(@Valid @ModelAttribute ItemListingJsonDTO form) {
+    ItemListingResponseDTO saved = itemListingService.addItem(form);
 
     URI location = ServletUriComponentsBuilder.fromCurrentRequest()
-            .path("/{id}").buildAndExpand(item.getId()).toUri();
+            .path("/{id}").buildAndExpand(saved.id()).toUri();
 
-    return ResponseEntity.created(location).body(ItemResponseDTO.from(item));
+    return ResponseEntity.created(location).body(saved);
   }
 
   @GetMapping("/{id}")
-  public ResponseEntity<ItemResponseDTO> getItemListingId(@PathVariable int id) {
+  public ResponseEntity<ItemListingResponseDTO> getItemListingId(@PathVariable int id) {
     ItemListing item = itemListingService.getItemById(id);
     if (item == null) {
       return ResponseEntity.notFound().build();
     }
-    return ResponseEntity.ok(ItemResponseDTO.from(item));
+    return ResponseEntity.ok(ItemListingResponseDTO.from(item));
   }
 }
