@@ -4,17 +4,19 @@ option java_multiple_files = true;
 option java_package = "generated";
 
 service ItemListingService {
-  rpc AddItemListing(AddItemListingRequest) returns ( ItemListingResponse);
+  rpc AddItemListing(AddItemListingRequest) returns (ItemListingResponse);
   rpc GetItemListing(GetItemListingRequest) returns (ItemListingResponse);
+  rpc ListItemListings (ListItemListingsRequest) returns (ListItemListingsResponse);
 }
-enum imageFileType{
-  png = 0;
-  jpg = 1;
+enum ImageFileType{
+  PNG = 0;
+  JPG = 1;
+  JPEG = 2;
 }
-enum categories{
-  clothing = 0;
-  accessories = 1;
-  curios = 2;
+enum Category {
+  CLOTHING = 0;
+  ACCESSORIES = 1;
+  CURIOS = 2;
 }
 // Represents a ItemListing entity in the system.
 message ItemListing {
@@ -24,13 +26,12 @@ message ItemListing {
   string description = 4;
   int32 price = 5;
   Album album = 6;
-  repeated categories categories = 7;
-  Date date = 8;
+  repeated Category categories = 7;
 }
 message UploadImageRequest{
  Image image = 1;
 }
-
+//Will only be used to verify the upload
 message UploadSummary {
   uint32 received_count = 1;
   uint64 total_bytes = 2;
@@ -42,7 +43,7 @@ message Album {
 }
 message Image {
   string name = 1;
-  imageFileType filetype = 2;
+  ImageFileType filetype = 2;
   uint32 width = 3;
   uint32 height = 4;
   bytes data = 5;
@@ -57,12 +58,25 @@ message ImageList {
 }
 // Request message for creating a new item listing.
 message AddItemListingRequest {
-  ItemListing itemListing = 1;
+  string itemName = 1;
+  string memberName = 2;
+  string description = 3;
+  int32 price = 4;
+  Album album = 5;
+  repeated Category categories = 6;
 }
 
+message ListItemListingsRequest  {
+  int32 page_size = 1;
+  string page_token = 2;
+}
+
+message ListItemListingsResponse {
+  repeated ItemListing items = 1;
+  string next_page_token = 2;
+}
 // Request message for retrieving an item listing
 message GetItemListingRequest {
-  // ID of the item listing to retrieve.
   int32 id = 1;
 }
 

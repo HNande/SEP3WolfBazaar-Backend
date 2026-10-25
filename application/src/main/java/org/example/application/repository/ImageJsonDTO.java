@@ -1,0 +1,14 @@
+package org.example.application.repository;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import jakarta.validation.constraints.*;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+public record ImageJsonDTO(
+    @NotBlank String name,
+    @NotNull ImageFileTypeDTO filetype,
+    @Positive int width,
+    @Positive int height,
+    @NotNull byte[] data
+) {
+}

@@ -2,7 +2,7 @@ package org.example.application.client;
 
 import generated.*;
 import net.devh.boot.grpc.client.inject.GrpcClient;
-import org.example.application.repository.ItemList;
+import org.example.application.repository.ItemListingMapper;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -11,13 +11,9 @@ public class ItemListingGrpcClient {
   @GrpcClient("item-listing-server")
   private ItemListingServiceGrpc.ItemListingServiceBlockingStub stub;
 
-  public ItemListing addItem(ItemListing item) {
-    AddItemListingRequest request = AddItemListingRequest.newBuilder()
-        .setItemListing(item)
-        .build();
+  public ItemListing addItem(AddItemListingRequest request) {
 
-    ItemListingResponse response = stub.addItemListing(request);
-    return response.getItemlisting();
+    return stub.addItemListing(request).getItemlisting();
   }
   public ItemListing getItem(int id) {
     GetItemListingRequest request = GetItemListingRequest.newBuilder()
