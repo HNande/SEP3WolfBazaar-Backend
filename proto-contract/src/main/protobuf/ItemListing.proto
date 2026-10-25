@@ -4,7 +4,7 @@ option java_multiple_files = true;
 option java_package = "generated";
 
 service ItemListingService {
-  rpc AddItemListing(AddItemListingRequest) returns (ItemListingResponse);
+  rpc AddItemListing(AddItemListingRequest) returns ( ItemListingResponse);
   rpc GetItemListing(GetItemListingRequest) returns (ItemListingResponse);
   rpc ListItemListings (ListItemListingsRequest) returns (ListItemListingsResponse);
 }
@@ -27,6 +27,8 @@ message ItemListing {
   int32 price = 5;
   Album album = 6;
   repeated Category categories = 7;
+  Date date = 8;
+  string memberEmail = 9;
 }
 message UploadImageRequest{
  Image image = 1;
@@ -77,6 +79,7 @@ message ListItemListingsResponse {
 }
 // Request message for retrieving an item listing
 message GetItemListingRequest {
+  // ID of the item listing to retrieve.
   int32 id = 1;
 }
 
