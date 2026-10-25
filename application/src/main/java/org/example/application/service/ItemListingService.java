@@ -6,7 +6,6 @@ import org.example.application.client.ItemListingGrpcClient;
 import org.example.application.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class ItemListingService {
@@ -18,8 +17,7 @@ public class ItemListingService {
     this.client = client;
   }
   public ItemListingResponseDTO addItem(ItemListingJsonDTO dto) {
-    AddItemListingRequest request = ItemListingMapper.toRequest(dto);
-    ItemListing saved = client.addItem(request);
+    ItemListing saved = client.addItem(dto);
     return ItemListingMapper.toResponse(saved);
   }
 

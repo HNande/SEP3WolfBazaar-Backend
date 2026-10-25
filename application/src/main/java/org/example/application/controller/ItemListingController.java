@@ -3,6 +3,7 @@ package org.example.application.controller;
 import generated.ItemListing;
 import jakarta.validation.Valid;
 import org.example.application.repository.ItemListingJsonDTO;
+import org.example.application.repository.ItemListingMapper;
 import org.example.application.repository.ItemListingResponseDTO;
 import org.example.application.service.ItemListingService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,10 +45,10 @@ public class ItemListingController {
 
   @GetMapping("/{id}")
   public ResponseEntity<ItemListingResponseDTO> getItemListingId(@PathVariable int id) {
-    ItemListing item = itemListingService.getItemById(id);
+    ItemListingResponseDTO item = itemListingService.getItemById(id);
     if (item == null) {
       return ResponseEntity.notFound().build();
     }
-    return ResponseEntity.ok(ItemListingResponseDTO.from(item));
+    return ResponseEntity.ok(item);
   }
 }
