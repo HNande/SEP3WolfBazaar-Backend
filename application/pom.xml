@@ -29,6 +29,11 @@
 		<java.version>25</java.version>
 	</properties>
 	<dependencies>
+	<dependency>
+		<groupId>net.devh</groupId>
+		<artifactId>grpc-client-spring-boot-starter</artifactId>
+		<version>3.1.0.RELEASE</version>
+	</dependency>
 		<dependency>
 			<groupId>org.example</groupId>
 			<artifactId>proto-contract</artifactId>

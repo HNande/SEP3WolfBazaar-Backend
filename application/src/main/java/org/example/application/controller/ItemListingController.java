@@ -2,7 +2,7 @@ package org.example.application.controller;
 
 import generated.Date;
 import generated.ItemListing;
-import org.example.application.repository.ItemFormDTO;
+import org.example.application.repository.ItemListingJsonDTO;
 import org.example.application.repository.ItemResponseDTO;
 import org.example.application.service.ItemListingService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +33,7 @@ public class ItemListingController {
   }
 
   @PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-  public ResponseEntity<ItemResponseDTO> addItem(@ModelAttribute ItemFormDTO form) {
+  public ResponseEntity<ItemResponseDTO> addItem(@ModelAttribute ItemListingJsonDTO form) {
     ItemListing item =  ItemListing.newBuilder()
         .setId(form.getId())
         .setItemName(form.getItemName())

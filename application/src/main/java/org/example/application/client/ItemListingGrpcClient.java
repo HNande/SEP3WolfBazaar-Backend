@@ -1,6 +1,8 @@
 package org.example.application.client;
 
 import generated.*;
+import net.devh.boot.grpc.client.inject.GrpcClient;
+import org.example.application.repository.ItemList;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -11,10 +13,17 @@ public class ItemListingGrpcClient {
 
   public ItemListing addItem(ItemListing item) {
     AddItemListingRequest request = AddItemListingRequest.newBuilder()
-        .setItemListing(toProto(item))
+        .setItemListing(item)
         .build();
 
-    ItemListingResponse response = stub.getItemListing(request);
-    return toDomain(response.getItemlisting());
+    ItemListingResponse response = stub.addItemListing(request);
+    return response.getItemlisting();
+  }
+  public ItemListing getItem(int id) {
+    GetItemListingRequest request = GetItemListingRequest.newBuilder()
+        .setId(id)
+        .build();
+
+    return stub.getItemListing(request).getItemlisting();
   }
 }

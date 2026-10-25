@@ -4,7 +4,7 @@ option java_multiple_files = true;
 option java_package = "generated";
 
 service ItemListingService {
-  rpc AddItemListing(stream AddItemListingRequest) returns (ItemListingResponse);
+  rpc AddItemListing(AddItemListingRequest) returns ( ItemListingResponse);
   rpc GetItemListing(GetItemListingRequest) returns (ItemListingResponse);
 }
 enum imageFileType{
@@ -63,7 +63,7 @@ message AddItemListingRequest {
 // Request message for retrieving an item listing
 message GetItemListingRequest {
   // ID of the item listing to retrieve.
-  string id = 1;
+  int32 id = 1;
 }
 
 message ItemListingResponse {
