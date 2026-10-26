@@ -4,6 +4,8 @@ import com.google.protobuf.ByteString;
 import generated.AddItemListingRequest;
 import generated.Album;
 import generated.Image;
+import org.example.data.dto.AlbumDataDTO;
+import org.example.data.dto.ImageDataDTO;
 import org.example.data.dto.ItemListingDataDTO;
 import org.example.data.entities.ItemListing;
 import org.example.data.entities.Member;
@@ -17,18 +19,14 @@ import static com.google.common.base.Strings.emptyToNull;
 
 public class ItemListingDataMapper {
   public static ItemListingDataDTO toEntity(AddItemListingRequest request) {
-    ItemListingDataDTO dto = new ItemListingDataDTO((request.getMemberName(),
+    ItemListingDataDTO dto = new ItemListingDataDTO(request.getMemberName(),
         request.getItemName(),
         request.getDescription(),
         request.getPrice(),
-        request.)
+        request.getAlbum().getImagesList())
     return dto;
   }
-  public static ItemListingResponseDTO toResponse(ItemListing item) {
-    Set<CategoryDTO> categories = item.getCategoriesList().stream()
-        .map(CATEGORY_FROM_PROTO::get)
-        .filter(Objects::nonNull)
-        .collect(Collectors.toCollection(LinkedHashSet::new));
+  public static ItemListingDataResponseDTO toResponse(ItemListing item) {
 
     return new ItemListingResponseDTO(
         item.getId(),
@@ -39,39 +37,39 @@ public class ItemListingDataMapper {
         categories,
         toAlbumResponse(item.getAlbum()));
   }
-  private static AlbumResponseDTO toAlbumResponse(Album a) {
-    return new AlbumResponseDTO(
+  private static AlbumDataDTO toAlbumDTO(Album a) {
+    return new AlbumDataDTO(
         a.getTitle(),
         a.getImagesList().stream()
-            .map(ItemListingMapper::toImageResponse)
+            .map(ItemListingDataMapper::toImageEntity)
             .toList());
   }
-  private static ImageResponseDTO toImageResponse(Image i) {
-    return new ImageResponseDTO(
+  private static ImageDataDTO toImageDTO(Image i) {
+    return new ImageDataDTO(
         i.getName(),
-        FILETYPE_FROM_PROTO.get(i.getFiletype()),
+        i.getFiletype().toString(),
         i.getWidth(),
         i.getHeight(),
         i.getData().toByteArray());     // ByteString -> byte[]
   }
-  private static Album toAlbum(AlbumJsonDTO dto) {
+  private static Album toProto(AlbumDataDTO dto) {
     Album.Builder builder = Album.newBuilder()
         .setTitle(dto.title());
 
     if (dto.images() != null) {
       builder.addAllImages(
           dto.images().stream()
-              .map(ItemListingMapper::toImage)
+              .map(ItemListingDataMapper::toProto)
               .toList());
     }
     return builder.build();
   }
 
-  private static Image toImage(ImageJsonDTO dto) {
+  private static Image toProto(ImageDataDTO dto) {
     return Image.newBuilder()
         .setName(dto.name())
-        .setFiletype(FILETYPE_TO_PROTO.get(dto.filetype()))
-        .setWidth(dto.width())
+        .setFiletype((dto.filetype().toString())
+        .setWeight(dto.width())
         .setHeight(dto.height())
         .setData(ByteString.copyFrom(dto.data()))
         .build();

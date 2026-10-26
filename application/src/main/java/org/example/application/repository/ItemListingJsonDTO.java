@@ -1,6 +1,5 @@
 package org.example.application.repository;
 
-import generated.categories;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import java.util.Set;
@@ -26,7 +25,7 @@ public record ItemListingJsonDTO(
      @Valid AlbumJsonDTO album,
      //Set is used to remove duplicate categories just in case
     @NotEmpty(message = "At least one category is required")
-     Set<@NotNull CategoryDTO> categories
+     Set<@NotNull CategoryJsonDTO> categories
 ) {
 
 }

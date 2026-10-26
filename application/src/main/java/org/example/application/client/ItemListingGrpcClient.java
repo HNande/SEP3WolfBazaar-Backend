@@ -1,10 +1,6 @@
 package org.example.application.client;
 
-import generated.AddItemListingRequest;
-import generated.GetItemListingRequest;
-import generated.ItemListing;
-import generated.ItemListingResponse;
-import org.example.application.ItemListingServiceGrpc;
+import generated.*;
 import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.example.application.repository.ItemListingJsonDTO;
 import org.example.application.repository.ItemListingMapper;

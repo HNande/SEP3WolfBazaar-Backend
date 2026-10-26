@@ -5,10 +5,10 @@ import com.fasterxml.jackson.annotation.JsonValue;
 
 import java.util.Locale;
 
-public enum CategoryDTO {
+public enum CategoryJsonDTO {
   CLOTHING, ACCESSORIES, CURIOS;
 
-  @JsonCreator public static CategoryDTO fromJson(String category) {
+  @JsonCreator public static CategoryJsonDTO fromJson(String category) {
     if (category == null)
       return null;
     try {

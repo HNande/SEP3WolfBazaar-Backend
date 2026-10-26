@@ -12,6 +12,7 @@ import org.example.data.entities.ItemPicture;
 import org.example.data.entities.Member;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.example.data.repository.CategoryRepository;
@@ -35,7 +36,7 @@ public class DataItemListingService {
     private final MemberRepository memberRepository;
     private final CategoryRepository categoryRepository;
     private final Path uploadDir = Paths.get("uploads");
-
+    @Autowired
     public DataItemListingService(
             ItemListingRepository itemListingRepository,
             MemberRepository memberRepository,
@@ -47,7 +48,7 @@ public class DataItemListingService {
 
     @Transactional
     public ItemListing addItem(ItemListing protoItem) {
-        org.example.data.entities.ItemListing entity = new ItemListing();
+        ItemListing entity = new ItemListing();
         entity.setItemName(protoItem.getItemName());
         entity.setDescription(protoItem.getDescription());
         entity.setPrice(protoItem.getPrice());

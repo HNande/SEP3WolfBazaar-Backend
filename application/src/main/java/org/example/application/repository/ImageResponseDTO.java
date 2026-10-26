@@ -2,7 +2,7 @@ package org.example.application.repository;
 
 public record ImageResponseDTO(
     String name,
-    ImageFileTypeDTO filetype,
+    ImageFileTypeJsonDTO filetype,
     int width,
     int height,
     byte[] data

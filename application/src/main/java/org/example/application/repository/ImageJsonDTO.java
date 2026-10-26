@@ -6,7 +6,7 @@ import jakarta.validation.constraints.*;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record ImageJsonDTO(
     @NotBlank String name,
-    @NotNull ImageFileTypeDTO filetype,
+    @NotNull ImageFileTypeJsonDTO filetype,
     @Positive int width,
     @Positive int height,
     @NotNull byte[] data

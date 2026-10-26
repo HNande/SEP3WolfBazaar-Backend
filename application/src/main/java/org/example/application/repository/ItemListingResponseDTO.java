@@ -1,9 +1,5 @@
 package org.example.application.repository;
 
-import generated.Date;
-import generated.ItemListing;
-import generated.categories;
-
 import java.util.Set;
 
 public record ItemListingResponseDTO(
@@ -12,7 +8,7 @@ public record ItemListingResponseDTO(
     String memberName,
     String description,
     int price,
-    Set<CategoryDTO> categories,
+    Set<CategoryJsonDTO> categories,
     AlbumResponseDTO album
     ){
 }

@@ -2,7 +2,6 @@ package org.example.application.repository;
 
 import com.google.protobuf.ByteString;
 import generated.*;
-import jakarta.validation.constraints.NotNull;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -10,21 +9,21 @@ import java.util.stream.Collectors;
 import static com.google.common.base.Strings.emptyToNull;
 
 public final class ItemListingMapper {
-  private static final Map<CategoryDTO, Category> CATEGORY_TO_PROTO = Map.of(
-      CategoryDTO.CLOTHING, Category.CLOTHING,
-      CategoryDTO.ACCESSORIES, Category.ACCESSORIES,
-      CategoryDTO.CURIOS,   Category.CURIOS);
+  private static final Map<CategoryJsonDTO, Category> CATEGORY_TO_PROTO = Map.of(
+      CategoryJsonDTO.CLOTHING, Category.CLOTHING,
+      CategoryJsonDTO.ACCESSORIES, Category.ACCESSORIES,
+      CategoryJsonDTO.CURIOS,   Category.CURIOS);
 
-  private static final Map<Category, CategoryDTO> CATEGORY_FROM_PROTO =
+  private static final Map<Category, CategoryJsonDTO> CATEGORY_FROM_PROTO =
       CATEGORY_TO_PROTO.entrySet().stream()
           .collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey));
 
-  private static final Map<ImageFileTypeDTO, ImageFileType> FILETYPE_TO_PROTO = new EnumMap<>(Map.of(
-      ImageFileTypeDTO.PNG, ImageFileType.PNG,
-      ImageFileTypeDTO.JPEG, ImageFileType.JPEG,
-      ImageFileTypeDTO.JPG, ImageFileType.JPG));
+  private static final Map<ImageFileTypeJsonDTO, ImageFileType> FILETYPE_TO_PROTO = new EnumMap<>(Map.of(
+      ImageFileTypeJsonDTO.PNG, ImageFileType.PNG,
+      ImageFileTypeJsonDTO.JPEG, ImageFileType.JPEG,
+      ImageFileTypeJsonDTO.JPG, ImageFileType.JPG));
 
-  private static final Map<ImageFileType, ImageFileTypeDTO> FILETYPE_FROM_PROTO =
+  private static final Map<ImageFileType, ImageFileTypeJsonDTO> FILETYPE_FROM_PROTO =
       FILETYPE_TO_PROTO.entrySet().stream()
           .collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey));
 
@@ -42,7 +41,7 @@ public final class ItemListingMapper {
     return builder.build();
   }
   public static ItemListingResponseDTO toResponse(ItemListing item) {
-    Set<CategoryDTO> categories = item.getCategoriesList().stream()
+    Set<CategoryJsonDTO> categories = item.getCategoriesList().stream()
         .map(CATEGORY_FROM_PROTO::get)
         .filter(Objects::nonNull)
         .collect(Collectors.toCollection(LinkedHashSet::new));
@@ -93,7 +92,7 @@ public final class ItemListingMapper {
         .setData(ByteString.copyFrom(dto.data()))
         .build();
   }
-  private static List<Category> toProtoCategories(Set<CategoryDTO> categories) {
+  private static List<Category> toProtoCategories(Set<CategoryJsonDTO> categories) {
     return categories.stream()
         .map(CATEGORY_TO_PROTO::get)
         .toList();
