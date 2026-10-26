@@ -2,6 +2,7 @@ package org.example.application.repository;
 
 import com.google.protobuf.ByteString;
 import generated.*;
+import jakarta.validation.constraints.NotNull;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -32,7 +33,8 @@ public final class ItemListingMapper {
         .setItemName(dto.itemName())
         .setMemberName(dto.memberName())
         .setDescription(dto.description())
-        .setPrice(dto.price());
+        .setPrice(dto.price())
+        .addAllCategories(toProtoCategories(dto.categories()));
 
     if (dto.album() != null) {
       builder.setAlbum(toAlbum(dto.album()));
@@ -90,5 +92,10 @@ public final class ItemListingMapper {
         .setHeight(dto.height())
         .setData(ByteString.copyFrom(dto.data()))
         .build();
+  }
+  private static List<Category> toProtoCategories(Set<CategoryDTO> categories) {
+    return categories.stream()
+        .map(CATEGORY_TO_PROTO::get)
+        .toList();
   }
 }

@@ -22,7 +22,7 @@ public class ItemListingGrpcClient {
 
     return stub.addItemListing(request).getItemlisting();
   }
-  //Double whammy methods
+
   public ItemListing getItem(int id) {
     GetItemListingRequest request = GetItemListingRequest.newBuilder()
         .setId(id)

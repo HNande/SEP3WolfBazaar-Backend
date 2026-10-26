@@ -26,12 +26,12 @@ public class ItemListingController {
     this.itemListingService = itemListingService;
   }
 
-  @GetMapping("")
-  public List<ItemListingResponseDTO> getItemList() {
-    return itemListingService.getItemList().getItemList().stream()
-            .map(ItemListingResponseDTO::from)
-            .toList();
-  }
+//@GetMapping("")
+//public List<ItemListingResponseDTO> getItemList() {
+//  return itemListingService.getItemList().getItemList().stream()
+//          .map(ItemListingResponseDTO::from)
+//          .toList();
+//}
 
   @PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<ItemListingResponseDTO> addItem(@Valid @ModelAttribute ItemListingJsonDTO form) {

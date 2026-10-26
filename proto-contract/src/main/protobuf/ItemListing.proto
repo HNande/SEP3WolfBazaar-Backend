@@ -28,12 +28,16 @@ message ItemListing {
   Album album = 6;
   repeated Category categories = 7;
   Date date = 8;
-  string memberEmail = 9;
+}
+message Member {
+  string memberName = 1;
+  string memberEmail = 2;
+
 }
 message UploadImageRequest{
  Image image = 1;
 }
-//Will only be used to verify the upload
+//Will only be used to verify Image upload
 message UploadSummary {
   uint32 received_count = 1;
   uint64 total_bytes = 2;
