@@ -1,56 +1,58 @@
 package org.example.data.mappers;
 
 import com.google.protobuf.ByteString;
-import generated.AddItemListingRequest;
-import generated.Album;
-import generated.Image;
+import generated.*;
 import org.example.data.dto.AlbumDataDTO;
 import org.example.data.dto.ImageDataDTO;
 import org.example.data.dto.ItemListingDataDTO;
-import org.example.data.entities.ItemListing;
-import org.example.data.entities.Member;
+import org.example.data.dto.ItemListingResponseDTO;
 
-import java.util.LinkedHashSet;
-import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.List;
 
 import static com.google.common.base.Strings.emptyToNull;
 
 public class ItemListingDataMapper {
-  public static ItemListingDataDTO toEntity(AddItemListingRequest request) {
-    ItemListingDataDTO dto = new ItemListingDataDTO(request.getMemberName(),
+
+  //ItemListingDataDTO --> ItemListingDAO.addNewItemListing(ItemListingDataDTO)
+  //ItemListing DAO provides ItemID, and Date
+  public static ItemListingDataDTO toDomainDTO(AddItemListingRequest request) {
+    return new ItemListingDataDTO(
         request.getItemName(),
+        request.getMemberName(),
         request.getDescription(),
         request.getPrice(),
-        request.getAlbum().getImagesList())
-    return dto;
+        request.getCategoriesList(),
+        toAlbumDTO(request.getAlbum()));
   }
-  public static ItemListingDataResponseDTO toResponse(ItemListing item) {
 
-    return new ItemListingResponseDTO(
-        item.getId(),
-        item.getItemName(),
-        item.getMemberName(),
-        emptyToNull(item.getDescription()),
-        item.getPrice(),
-        categories,
-        toAlbumResponse(item.getAlbum()));
+  public static ItemListingResponse toResponse(ItemListingResponseDTO dto) {
+
+    return ItemListingResponse.newBuilder()
+        .setItemlisting(
+            ItemListing.newBuilder()
+            .setId(dto.id())
+            .setItemName(dto.itemName())
+            .setMemberName(dto.memberName())
+            .setPrice(dto.price())
+            .addAllCategories(dto.categories())
+            .setAlbum(toProto(dto.album()))
+            .build())
+        .build();
   }
-  private static AlbumDataDTO toAlbumDTO(Album a) {
+  private static AlbumDataDTO toAlbumDTO(Album album) {
     return new AlbumDataDTO(
-        a.getTitle(),
-        a.getImagesList().stream()
-            .map(ItemListingDataMapper::toImageEntity)
+        album.getTitle(),
+        album.getImagesList().stream()
+            .map(ItemListingDataMapper::toImageDTO)
             .toList());
   }
-  private static ImageDataDTO toImageDTO(Image i) {
+  private static ImageDataDTO toImageDTO(Image image) {
     return new ImageDataDTO(
-        i.getName(),
-        i.getFiletype().toString(),
-        i.getWidth(),
-        i.getHeight(),
-        i.getData().toByteArray());     // ByteString -> byte[]
+        image.getName(),
+        image.getFiletype().toString(),
+        image.getWidth(),
+        image.getHeight(),
+        image.getData().toByteArray());     // ByteString -> byte[]
   }
   private static Album toProto(AlbumDataDTO dto) {
     Album.Builder builder = Album.newBuilder()
@@ -66,12 +68,14 @@ public class ItemListingDataMapper {
   }
 
   private static Image toProto(ImageDataDTO dto) {
+
     return Image.newBuilder()
         .setName(dto.name())
-        .setFiletype((dto.filetype().toString())
-        .setWeight(dto.width())
+        .setFiletype(ImageFileType.valueOf(dto.filetype()))
+        .setWidth(dto.width())
         .setHeight(dto.height())
         .setData(ByteString.copyFrom(dto.data()))
         .build();
+
   }
 }

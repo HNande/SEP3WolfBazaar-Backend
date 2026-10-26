@@ -1,4 +1,4 @@
-package service;
+package org.example.data.service;
 
 import com.google.protobuf.ByteString;
 import generated.Album;

@@ -9,6 +9,9 @@ public record ItemListingResponseDTO(
     String description,
     int price,
     Set<CategoryJsonDTO> categories,
-    AlbumResponseDTO album
+    AlbumResponseDTO album,
+    int year,
+    int month,
+    int day
     ){
 }
