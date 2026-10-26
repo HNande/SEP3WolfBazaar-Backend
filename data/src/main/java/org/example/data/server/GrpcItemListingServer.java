@@ -3,7 +3,7 @@ package org.example.data.server;
 import generated.AddItemListingRequest;
 import generated.GetItemListingRequest;
 //import generated.ItemListing;
-import org.example.data.model.ItemListing;
+import org.example.data.entities.ItemListing;
 import generated.ItemListingResponse;
 import generated.ItemListingServiceGrpc;
 import io.grpc.Status;

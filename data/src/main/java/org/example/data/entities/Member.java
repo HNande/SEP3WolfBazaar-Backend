@@ -16,6 +16,9 @@ public class Member
   @Column(nullable = false)
   private String password;
 
+  @Column(nullable = false)
+  private String email;
+
   protected Member(){
 
   }
@@ -50,4 +53,7 @@ public class Member
   {
     this.password = password;
   }
+
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
 }

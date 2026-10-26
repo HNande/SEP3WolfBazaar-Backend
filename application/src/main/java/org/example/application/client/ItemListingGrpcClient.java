@@ -4,7 +4,7 @@ import generated.AddItemListingRequest;
 import generated.GetItemListingRequest;
 import generated.ItemListing;
 import generated.ItemListingResponse;
-import generated.ItemListingServiceGrpc;
+import org.example.application.ItemListingServiceGrpc;
 import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.example.application.repository.ItemListingJsonDTO;
 import org.example.application.repository.ItemListingMapper;
