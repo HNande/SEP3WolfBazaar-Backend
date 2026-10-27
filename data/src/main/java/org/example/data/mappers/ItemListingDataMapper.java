@@ -52,7 +52,7 @@ public class ItemListingDataMapper {
 
   //It’s okay overall, but it comes with some crutch.
   public static ItemListingResponseDTO toResponseDTO(org.example.data.entities.ItemListing itemListing) {
-    ItemListingResponseDTO itemListingResponseDTO = new ItemListingResponseDTO(
+    return new ItemListingResponseDTO(
             itemListing.getItemId(),
             itemListing.getItemName(),
             itemListing.getMember().getFullName(),
@@ -64,18 +64,16 @@ public class ItemListingDataMapper {
             itemListing.getListDate().getMonthValue(),
             itemListing.getListDate().getDayOfMonth()
     );
-    return itemListingResponseDTO;
   }
 
   // I think it’s generally clear why this is needed. But just in case - the issue is that the data types don’t match.
-  private static <T> List<Category> fromSetToList(T set)
-  {
-    List<Category> categoryList = new ArrayList<>((Integer) set);
-    return categoryList;
+  // Its good unless we want to make an adapter later for sets(as currently db only accepts lists), which I don't wanna
+  private static <T> List<Category> fromSetToList(T set) {
+    return new ArrayList<>((Integer) set);
   }
-
-  private static <T> AlbumDataDTO fromListToAlbonDTO(List<ItemPicture> list)
-  {
+// There should be no case that an received album does not have a name, as it should inherit the name from the created itemlisting + "album",
+//so for Itemlisting.name = Hamburger, Itemlisting.albumTitle = Hamburger Album
+  private static <T> AlbumDataDTO fromListToAlbonDTO(List<ItemPicture> list) {
     Random random = new Random();
     int randomValue = random.nextInt(10000);
     String randomAlbumName = "" + randomValue;
@@ -83,8 +81,7 @@ public class ItemListingDataMapper {
     for (int i = 0; i < list.size(); i++) {
       neededList.add(toDTO(list.get(i)));
     }
-    AlbumDataDTO albumDataDTO = new AlbumDataDTO( randomAlbumName, neededList);
-    return albumDataDTO;
+    return new AlbumDataDTO( randomAlbumName, neededList);
   }
 
   public static ImageDataDTO toDTO(ItemPicture picture) {
@@ -115,6 +112,7 @@ public class ItemListingDataMapper {
       );
 
     } catch (Exception e) {
+      //Haha if there is an issue it will create an imagedto with no width or height I like this
       return new ImageDataDTO(
               picture.getFileName(),
               picture.getFileType() != null ? picture.getFileType().name() : "UNKNOWN",

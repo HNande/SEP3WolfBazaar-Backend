@@ -176,6 +176,7 @@ public class DataItemListingService {
                 .setAlbum(albumBuilder.build());
 
         // I don't understand. Good luck, Nandi
+        //  I really don't know either
         for (Category cat : entity.getCategories()) {
             try {
                 builder.addCategories(categories.valueOf(cat.getName()));
