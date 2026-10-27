@@ -1,28 +1,24 @@
 package org.example.application.repository;
 
+import generated.AddItemListingRequest;
 import generated.ItemListing;
-import org.springframework.stereotype.Repository;
-import org.springframework.web.multipart.MultipartFile;
 
-@Repository public class ItemDAO {
-  private static ItemList items = new ItemList();
+import java.util.List;
+import java.util.Optional;
 
-  static {
-    items.getItemList().add(new ItemListing(1));
-  }
+public interface ItemDAO {
 
-  public ItemList getAllItems() {
-    return items;
-  }
+  ItemListing addItem(AddItemListingRequest request);
 
-  public ItemListing getItemById(int id) {
-    return items.getItemList().stream().filter(i -> i.getItemListingId() == id)
-        .findFirst().orElse(null);
-  }
+  Optional<ItemListing> getItemById(int id);
 
-  public void addItem(ItemListing item, MultipartFile[] photos) {
-    item.setItemListingId(items.getItemList().size() + 1);
-    item.setPhotos(photos);
-    items.getItemList().add(item);
+  ItemPage getItems(int pageSize, String pageToken);
+
+  List<ItemListing> getAllItems();
+
+  record ItemPage(List<ItemListing> items, String nextPageToken) {
+    public boolean hasNext() {
+      return nextPageToken != null && !nextPageToken.isEmpty();
+    }
   }
 }

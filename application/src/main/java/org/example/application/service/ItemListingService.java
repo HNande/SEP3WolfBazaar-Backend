@@ -1,38 +1,38 @@
 package org.example.application.service;
 
 import generated.AddItemListingRequest;
-import generated.ItemListing;
-import org.example.application.client.ItemListingGrpcClient;
-import org.example.application.repository.*;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.example.application.repository.ItemDAO;
+import org.example.application.repository.ItemListingJsonDTO;
+import org.example.application.repository.ItemListingMapper;
+import org.example.application.repository.ItemListingResponseDTO;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 public class ItemListingService {
-  private final ItemListingGrpcClient client;
-  private ItemDAO itemDAO;
 
-  @Autowired
-  public ItemListingService(ItemListingGrpcClient client) {
-    this.client = client;
+  private final ItemDAO itemDAO;
+
+  public ItemListingService(ItemDAO itemDAO) {
+    this.itemDAO = itemDAO;
   }
+
   public ItemListingResponseDTO addItem(ItemListingJsonDTO dto) {
-    ItemListing saved = client.addItem(dto);
-    return ItemListingMapper.toResponse(saved);
+    AddItemListingRequest request = ItemListingMapper.toRequest(dto);
+    return ItemListingMapper.toResponse(itemDAO.addItem(request));
   }
 
   public ItemListingResponseDTO getItemById(int id) {
-    return ItemListingMapper.toResponse(client.getItem(id));
-  }
-  public ItemList getItemList() {
-    return itemDAO.getAllItems();
+    return itemDAO.getItemById(id)
+            .map(ItemListingMapper::toResponse)
+            .orElseThrow(() -> new NoSuchElementException("Item " + id + " not found"));
   }
 
-// public void addItem(ItemListing item) {
-//   itemDAO.addItem(item);
-// }
-
-//public ItemListing getItemById(int id) {
-//  return itemDAO.getItemById(id);
-//}
+  public List<ItemListingResponseDTO> getAllItems() {
+    return itemDAO.getAllItems().stream()
+            .map(ItemListingMapper::toResponse)
+            .toList();
+  }
 }
