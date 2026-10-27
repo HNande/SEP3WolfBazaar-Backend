@@ -2,12 +2,13 @@ package org.example.data.server;
 
 import generated.AddItemListingRequest;
 import generated.GetItemListingRequest;
-//import generated.ItemListing;
-import org.example.data.entities.ItemListing;
+import generated.ItemListing;
 import generated.ItemListingResponse;
 import generated.ItemListingServiceGrpc;
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
+import org.example.data.dto.ItemListingDataDTO;
+import org.example.data.dto.ItemListingResponseDTO;
 import org.example.data.service.DataItemListingService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +16,8 @@ import org.springframework.grpc.server.service.GrpcService;
 
 
 import java.util.Optional;
+
+import static org.example.data.mappers.ItemListingDataMapper.*;
 
 @GrpcService
 public class GrpcItemListingServer extends ItemListingServiceGrpc.ItemListingServiceImplBase {
@@ -29,14 +32,14 @@ public class GrpcItemListingServer extends ItemListingServiceGrpc.ItemListingSer
     @Override
     public void addItemListing(AddItemListingRequest request, StreamObserver<ItemListingResponse> responseObserver) {
         try {
-            ItemListing savedItem = service.addItem(request.getItemListing());
-            ItemListingResponse response = ItemListingResponse.newBuilder()
-                    .setItemlisting(savedItem)
-                    .build();
+            ItemListingDataDTO dto = toDomainDTO(request);
+            ItemListingResponseDTO responseDto= service.addItem(dto);
+            ItemListingResponse response = toResponse(responseDto);
 
             responseObserver.onNext(response);
-            LOG.info("\nItem Listing [ id={}, name={} ] added successfully\n", savedItem.getId(), savedItem.getItemName());
+            LOG.info("\nItem Listing [ id={}, name={} ] added successfully\n", responseDto.id(), responseDto.itemName());
             responseObserver.onCompleted();
+
         } catch (Exception e) {
             LOG.error("Error saving ItemListing to database", e);
             responseObserver.onError(Status.INTERNAL

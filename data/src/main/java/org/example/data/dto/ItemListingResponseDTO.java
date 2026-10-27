@@ -12,7 +12,10 @@ public record ItemListingResponseDTO(
     String description,
     int price,
     List<Category> categories,
-    AlbumDataDTO album
+    AlbumDataDTO album,
+    int year,
+    int month,
+    int day
 
 ) {
 

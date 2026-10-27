@@ -39,6 +39,10 @@ public class ItemListingDataMapper {
             .build())
         .build();
   }
+  //TODO Before constructing the proto ItemListingResponse we should first turn the ItemListing Entity into a ResponseDTO and then turn the ResponseDTO into the Response the Server uses
+  public static ItemListingResponseDTO toResponseDTO(org.example.data.entities.ItemListing itemListing) {
+
+  }
   private static AlbumDataDTO toAlbumDTO(Album album) {
     return new AlbumDataDTO(
         album.getTitle(),

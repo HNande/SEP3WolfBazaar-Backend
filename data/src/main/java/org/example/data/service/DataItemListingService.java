@@ -6,8 +6,10 @@ import generated.Date;
 import generated.Image;
 //import generated.categories;
 //import generated.imageFileType;
-import generated.ItemListing;
+import org.example.data.dto.ImageDataDTO;import org.example.data.dto.ItemListingDataDTO;
+import org.example.data.dto.ItemListingResponseDTO;
 import org.example.data.entities.Category;
+import org.example.data.entities.ItemListing;
 import org.example.data.entities.ItemPicture;
 import org.example.data.entities.Member;
 import org.slf4j.Logger;
@@ -25,7 +27,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
-import java.util.Optional;
+import java.util.Optional;import static org.example.data.mappers.ItemListingDataMapper.toResponseDTO;
 
 @Service
 public class DataItemListingService {
@@ -47,39 +49,36 @@ public class DataItemListingService {
     }
 
     @Transactional
-    public ItemListing addItem(ItemListing protoItem) {
+    public ItemListingResponseDTO addItem(ItemListingDataDTO dto) {
+        //Protected methods are only accessible in the same package or in subclasses, I suggest DAO as part of instance variable,
+        // and calling the method from that class,  DAO can use the repositories because it can be in the same package as the them(while service shouldn't be)
         ItemListing entity = new ItemListing();
-        entity.setItemName(protoItem.getItemName());
-        entity.setDescription(protoItem.getDescription());
-        entity.setPrice(protoItem.getPrice());
+        entity.setItemName(dto.itemName());
+        entity.setDescription(dto.description());
+        entity.setPrice(dto.price());
 
         // 1. Map Date (or default to today)
-        if (protoItem.hasDate() && protoItem.getDate().getYear() > 0) {
-            entity.setListDate(LocalDate.of(
-                    protoItem.getDate().getYear(),
-                    Math.max(1, protoItem.getDate().getMonth()),
-                    Math.max(1, protoItem.getDate().getDay())
-            ));
-        } else {
-            entity.setListDate(LocalDate.now());
-        }
+        // Received DTO from add message will never contain date fields, only responses do
+        entity.setListDate(LocalDate.now());
+
 
         // 2. Find or create Member by Email
-        String rawIdentifier = protoItem.getMemberName().isBlank()
+        String rawIdentifier = dto.memberName().isBlank()
                 ? "wolf@cloverville.dk"
-                : protoItem.getMemberName().trim();
+                : dto.memberName().trim();
 
         // If the client passed an email in memberName, use it; otherwise format as email
         String email = rawIdentifier.contains("@")
                 ? rawIdentifier.toLowerCase()
                 : rawIdentifier.toLowerCase().replaceAll("\\s+", ".") + "@cloverville.dk";
 
+        //Adding a new item shouldn't create a Member in the future, but for now its fine to test
         Member member = memberRepository.findByEmail(email)
                 .orElseGet(() -> memberRepository.save(new Member(rawIdentifier, email, "default_password")));
         entity.setMember(member);
 
         // 3. Find or create Categories
-        for (categories protoCat : protoItem.getCategoriesList()) {
+        for (generated.Category protoCat : dto.categories()) {
             String catName = protoCat.name();
             Category category = categoryRepository.findByName(catName)
                     .orElseGet(() -> categoryRepository.save(new Category(catName)));
@@ -87,17 +86,18 @@ public class DataItemListingService {
         }
 
         // 4. Map Album Images to ItemPicture with proper IOException handling
-        if (protoItem.hasAlbum()) {
-            for (Image protoImg : protoItem.getAlbum().getImagesList()) {
-                String fileName = protoImg.getName().isBlank()
+        if (dto.album() != null) {
+            for (ImageDataDTO imageDTO : dto.album().images()) {
+                //TODO resolve filetype check based on dto.filetype
+                String fileName = imageDTO.name().isBlank()
                         ? "image_" + System.currentTimeMillis() + ".png"
-                        : protoImg.getName();
+                        : imageDTO.name();
                 Path filePath = uploadDir.resolve(fileName);
 
                 try {
-                    if (!protoImg.getData().isEmpty()) {
+                    if (imageDTO.data().length != 0) {
                         Files.createDirectories(uploadDir);
-                        Files.write(filePath, protoImg.getData().toByteArray());
+                        Files.write(filePath, imageDTO.data().toByteArray());
                     }
                 } catch (IOException e) {
                     LOG.error("Failed to write image file '{}' to disk at {}", fileName, filePath.toAbsolutePath(), e);
@@ -109,8 +109,8 @@ public class DataItemListingService {
             }
         }
 
-        model.ItemListing savedEntity = itemListingRepository.save(entity);
-        return toProto(savedEntity);
+        ItemListing savedEntity = itemListingRepository.save(entity);
+        return toResponseDTO(savedEntity);
     }
 
     @Transactional(readOnly = true)
