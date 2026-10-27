@@ -53,7 +53,10 @@ public final class ItemListingMapper {
         emptyToNull(item.getDescription()),
         item.getPrice(),
         categories,
-        toAlbumResponse(item.getAlbum()));
+        toAlbumResponse(item.getAlbum()),
+            item.getDate().getYear(),
+            item.getDate().getMonth(),
+            item.getDate().getDay());
   }
   private static AlbumResponseDTO toAlbumResponse(Album a) {
     return new AlbumResponseDTO(

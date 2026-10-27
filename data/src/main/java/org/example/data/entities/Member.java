@@ -29,6 +29,12 @@ public class Member
     this.password = password;
   }
 
+  //(Artem) Fixed a bug in the DataItemListingService class without making extensive changes to it.
+  public Member(String email, String defaultPassword, boolean shit) {
+    this.email = email;
+    password = defaultPassword;
+  }
+
   public Long getMemberId()
   {
     return memberId;

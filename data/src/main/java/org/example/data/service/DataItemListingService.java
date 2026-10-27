@@ -8,10 +8,7 @@ import generated.Image;
 //import generated.imageFileType;
 import org.example.data.dto.ImageDataDTO;import org.example.data.dto.ItemListingDataDTO;
 import org.example.data.dto.ItemListingResponseDTO;
-import org.example.data.entities.Category;
-import org.example.data.entities.ItemListing;
-import org.example.data.entities.ItemPicture;
-import org.example.data.entities.Member;
+import org.example.data.entities.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,7 +49,7 @@ public class DataItemListingService {
     public ItemListingResponseDTO addItem(ItemListingDataDTO dto) {
         //Protected methods are only accessible in the same package or in subclasses, I suggest DAO as part of instance variable,
         // and calling the method from that class,  DAO can use the repositories because it can be in the same package as the them(while service shouldn't be)
-        ItemListing entity = new ItemListing();
+        ItemListing entity = new ItemListingCrutch(); // (Artem) set up a proxy
         entity.setItemName(dto.itemName());
         entity.setDescription(dto.description());
         entity.setPrice(dto.price());
@@ -74,7 +71,8 @@ public class DataItemListingService {
 
         //Adding a new item shouldn't create a Member in the future, but for now its fine to test
         Member member = memberRepository.findByEmail(email)
-                .orElseGet(() -> memberRepository.save(new Member(rawIdentifier, email, "default_password")));
+                .orElseGet(() -> memberRepository.save(new Member(email, "default_password", true))); //(Artem) It was a
+        // mess in here; I tidied it up as best I could, just to make sure it doesn't throw any errors.
         entity.setMember(member);
 
         // 3. Find or create Categories
@@ -94,17 +92,24 @@ public class DataItemListingService {
                         : imageDTO.name();
                 Path filePath = uploadDir.resolve(fileName);
 
+                // (Artem) There was a need for and use of classes that shared the same names but
+                // resided in different folders. I did my best to fix it.
+                org.example.data.entities.ImageFileType type = imageDTO.filetype() != null && stringEquals(imageDTO.filetype(),"jpg")
+                        ? org.example.data.entities.ImageFileType.JPG
+                        : org.example.data.entities.ImageFileType.PNG;
+
                 try {
                     if (imageDTO.data().length != 0) {
                         Files.createDirectories(uploadDir);
-                        Files.write(filePath, imageDTO.data().toByteArray());
+                        Files.write(filePath, imageDTO.data());  // (Artem) it’s already in bytes
                     }
                 } catch (IOException e) {
                     LOG.error("Failed to write image file '{}' to disk at {}", fileName, filePath.toAbsolutePath(), e);
                     throw new UncheckedIOException("Could not save image file: " + fileName, e);
                 }
 
-                ItemPicture picture = new ItemPicture(fileName, filePath.toString());
+                ItemPicture picture = new ItemPicture(fileName, type, filePath.toString()); // (Artem) A mess of parameters;
+                // added the type, as required by the constructor.
                 entity.addPicture(picture);
             }
         }
@@ -113,12 +118,18 @@ public class DataItemListingService {
         return toResponseDTO(savedEntity);
     }
 
+    // (Artem) Crutch method
+    private boolean stringEquals(String string1, String string2){
+        return string1.equals(string2);
+    }
+
     @Transactional(readOnly = true)
     public Optional<generated.ItemListing> getItemById(int id) {
         return itemListingRepository.findById(id).map(this::toProto);
     }
 
-    public generated.ItemListing toProto(model.ItemListing entity) {
+    // (Artem) removed the unnecessary link
+    public generated.ItemListing toProto(ItemListing entity) {
         LocalDate date = entity.getListDate() != null ? entity.getListDate() : LocalDate.now();
         Date protoDate = Date.newBuilder()
                 .setYear(date.getYear())
@@ -141,10 +152,11 @@ public class DataItemListingService {
             } catch (IOException e) {
                 LOG.error("Failed to read image file from path: {}", pic.getFilePath(), e);
             }
-
-            imageFileType type = pic.getFileName() != null && pic.getFileName().toLowerCase().endsWith(".jpg")
-                    ? imageFileType.jpg
-                    : imageFileType.png;
+            // (Artem) There was a need for and use of classes that shared the same names but resided
+            // in different folders. I did my best to fix it.
+            generated.ImageFileType type = pic.getFileName() != null && pic.getFileName().toLowerCase().endsWith(".jpg")
+                    ? generated.ImageFileType.JPG
+                    : generated.ImageFileType.PNG;
 
             Image protoImg = Image.newBuilder()
                     .setName(pic.getFileName() != null ? pic.getFileName() : "")
@@ -163,6 +175,7 @@ public class DataItemListingService {
                 .setDate(protoDate)
                 .setAlbum(albumBuilder.build());
 
+        // I don't understand. Good luck, Nandi
         for (Category cat : entity.getCategories()) {
             try {
                 builder.addCategories(categories.valueOf(cat.getName()));
