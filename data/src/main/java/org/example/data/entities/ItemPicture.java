@@ -18,7 +18,7 @@ public class ItemPicture {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long pictureId;
+  private int pictureId;
 
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
   @JoinColumn(name = "item_id", nullable = false)
@@ -43,7 +43,7 @@ public class ItemPicture {
     this.filePath = filePath;
   }
 
-  public Long getPictureId() {
+  public int getPictureId() {
     return pictureId;
   }
 

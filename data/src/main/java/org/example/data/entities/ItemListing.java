@@ -46,15 +46,15 @@ public class ItemListing {
     @OneToMany(mappedBy = "itemListing", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<ItemPicture> pictures = new ArrayList<>();
 
-    protected ItemListing() {
+    public ItemListing() {
     }
 
-   /* public ItemListing(org.example.data.entities.Member member, String itemName, String description, int price) {
+   public ItemListing(Member member, String itemName, String description, int price) {
         this.member = member;
         this.itemName = itemName;
         this.description = description;
         this.price = price;
-    }*/
+    }
 
     @PrePersist
     void onCreate() {
