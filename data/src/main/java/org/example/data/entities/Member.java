@@ -8,7 +8,7 @@ public class Member
 {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long memberId;
+  private int memberId;
 
   @Column(nullable = false)
   private String fullName;
@@ -35,7 +35,7 @@ public class Member
     password = defaultPassword;
   }
 
-  public Long getMemberId()
+  public int getMemberId()
   {
     return memberId;
   }

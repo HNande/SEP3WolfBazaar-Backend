@@ -10,7 +10,7 @@ public class Message {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long messageId;
+  private int messageId;
 
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
   @JoinColumn(name = "sender_id", nullable = false)
@@ -48,7 +48,7 @@ public class Message {
     }
   }
 
-  public Long getMessageId() {
+  public int getMessageId() {
     return messageId;
   }
 
