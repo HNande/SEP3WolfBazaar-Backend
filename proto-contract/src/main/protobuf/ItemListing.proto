@@ -1,5 +1,6 @@
 syntax = "proto3";
 import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
 option java_multiple_files = true;
 option java_package = "generated";
 
@@ -7,20 +8,37 @@ service ItemListingService {
   rpc AddItemListing (AddItemListingRequest) returns (StatusResponse);
   rpc GetItemListing (GetItemListingRequest) returns (ItemListingResponse);
   rpc ListItemListings (GetItemListingListRequest) returns (ListItemListingsResponse);
+  rpc UpdateItemListing (UpdateItemListingRequest) returns (ItemListingResponse);
+  rpc RemoveItemListing (RemoveItemListingRequest) returns (google.protobuf.Empty);
+}
+
+service MemberService{
+
+}
+
+service ConversationService{
+
 }
 
 //------Section global variables-------
 enum ImageFileType{
-  //UNSPECIFIED = -1;
-  PNG = 0;
-  JPG = 1;
-  JPEG = 2; //JPEG and JPG are interchangable filetypes, if preferable collapse into a single type, if not then store both
+  IMAGE_FILE_TYPE_UNSPECIFIED = 0;
+  IMAGE_FILE_TYPE_PNG = 1;
+  IMAGE_FILE_TYPE_JPG = 2;
+  IMAGE_FILE_TYPE_JPEG = 3; //JPEG and JPG are interchangable filetypes, if preferable collapse into a single type, if not then store both
 }
+
 enum Category {
-  //UNSPECIFIED = -1;
-  CLOTHING = 0;
-  ACCESSORIES = 1;
-  CURIOS = 2;
+  CATEGORY_UNSPECIFIED = 0;
+  CATEGORY_CLOTHING    = 1;
+  CATEGORY_ACCESSORIES = 2;
+  CATEGORY_CURIOS      = 3;
+}
+
+enum MemberField{
+  MEMBER_FIELD_UNSPECIFIED = 0;
+  MEMBER_FIELD_NAME        = 1;
+  MEMBER_FIELD_EMAIL       = 2;
 }
 
 message Date {
@@ -43,12 +61,14 @@ message ItemListingSummary{
 
 //-----------Section entities-----------
 message Image {
-  string name = 1;
-  ImageFileType filetype = 2;
-  uint32 width = 3;
-  uint32 height = 4;
-  bytes data = 5;
+  int32 id = 1;
+  string name = 2;
+  ImageFileType filetype = 3;
+  uint32 width = 4;
+  uint32 height = 5;
+  bytes data = 6;
 }
+
 message ItemListing {
   int32 id = 1;
   string itemName = 2;
@@ -59,10 +79,13 @@ message ItemListing {
   repeated Category categories = 7;
   Date created_at = 8;
 }
+
 message Member {
-  string memberName = 1;
-  string memberEmail = 2;
+  int32 id = 1;
+  string memberName = 2;
+  string memberEmail = 3;
 }
+
 message Message {
   int32 id = 1;
   int32 conversation_id = 2;
@@ -71,6 +94,7 @@ message Message {
   //https://www.baeldung.com/java-convert-google-protocol-buffer-timestamp-localdate
   google.protobuf.Timestamp created_at = 5;
 }
+
 message Conversation {
   int32 id = 1;
   repeated string participant_ids = 2;
@@ -83,24 +107,30 @@ message AddItemListingRequest {
   string memberName = 2;
   string description = 3;
   int32 price = 4;
-  repeated Category categories = 6;
-  repeated Image images = 7;
+  repeated Category categories = 5;
+  repeated Image images = 6;
 }
 
 message AddImageRequest{
   int32 item_id= 1;
   Image image = 2;
 }
-message RegistrationRequest{
 
+message AddMemberRequest{
+  string memberName = 1;
+  string memberEmail = 2;
+  string password = 3;
 }
-message UpdateItemListingRequest{
-  string itemName = 1;
-  string memberName = 2;
-  string description = 3;
-  int32 price = 4;
-  repeated Category categories = 6;
-  repeated Image images = 7;
+
+message AddConversationRequest{
+  repeated string participant_ids = 1;
+  int32  item_listing_id = 2;
+}
+
+message AddMessageRequest{
+  int32 conversation_id = 1;
+  int32 sender_id = 2;
+  string content = 3;
 }
 
 message GetItemListingListRequest  {
@@ -108,19 +138,79 @@ message GetItemListingListRequest  {
   string page_token = 2;
 }
 
+message GetItemListingRequest {
+  int32 id = 1;
+}
+
+ //All rounder update request for items, if the update only contains specific fields use narrowed requests instead
+message UpdateItemListingRequest{
+  int32  item_id = 1;
+  string itemName = 2;
+  string memberName = 3;
+  string description = 4;
+  int32 price = 5;
+  repeated Category categories = 6;
+  repeated Image images = 7;
+}
+
+message UpdateItemListingNameRequest{
+  int32 item_id = 1;
+  string itemName = 2;
+}
+
+message UpdateItemListingDescRequest{
+  int32 item_id = 1;
+  string description = 2;
+}
+
+message UpdateItemListingPriceRequest{
+  int32 item_id = 1;
+  int32 price = 2;
+}
+
+message UpdateItemListingCategoryRequest{
+  int32 item_id = 1;
+  repeated Category categories = 2;
+}
+
+message RemoveItemListingRequest{
+  int32 item_id = 1;
+}
+
+message RemoveItemListingImageRequest{
+  int32 item_id = 1;
+  int32 image_id = 2;
+}
+
+message RemoveMemberRequest{
+  int32 member_id = 1;
+}
+
+message RemoveConversationRequest{
+  int32 conversation_id = 1;
+}
+
+message LoginRequest{
+  string memberName = 1;
+  string password = 3;
+}
+
 message ListItemListingsResponse {
   repeated ItemListingSummary items = 1;
   string next_page_token = 2;
 }
 
-message GetItemListingRequest {
-  int32 id = 1;
-}
-
 message ItemListingResponse {
   ItemListing itemlisting = 1;
 }
+
 //Only used when verifying any upload or registration or creation
 message StatusResponse {
   string response = 1;
+}
+
+//Check for a specific field of member when trying to register
+message CheckRegisterAvailabilityFieldRequest{
+  MemberField field = 1;
+  string content = 2;
 }
