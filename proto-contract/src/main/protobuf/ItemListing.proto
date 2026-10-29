@@ -7,32 +7,34 @@ service ItemListingService {
   rpc AddItemListing(AddItemListingRequest) returns ( ItemListingResponse);
   rpc GetItemListing(GetItemListingRequest) returns (ItemListingResponse);
   rpc ListItemListings (ListItemListingsRequest) returns (ListItemListingsResponse);
+  rpc ListItemSummaries(ListItemListingsRequest) returns (ListItemSummariesResponse);
+  rpc GetItemThumbnails(GetItemThumbnailsRequest) returns (GetItemThumbnailsResponse);
 }
+
+message ItemSummary {
+  int32 id = 1;  string itemName = 2;
+  string description = 3;  int32 price = 4;
+  Date date = 5;
+}
+message ListItemSummariesResponse { repeated ItemSummary items = 1; string next_page_token = 2; }
+message GetItemThumbnailsRequest { repeated int32 item_ids = 1; }
+message ItemThumbnail { int32 item_id = 1; ImageFileType filetype = 2;
+  uint32 width = 3; uint32 height = 4; bytes data = 5; }
+message GetItemThumbnailsResponse { repeated ItemThumbnail thumbnails = 1; }
+
 enum ImageFileType{
   PNG = 0;
   JPG = 1;
   JPEG = 2;
 }
-enum Category {
-  CLOTHING = 0;
-  ACCESSORIES = 1;
-  CURIOS = 2;
-}
 // Represents a ItemListing entity in the system.
 message ItemListing {
   int32 id = 1;
   string itemName = 2;
-  string memberName = 3;
-  string description = 4;
-  int32 price = 5;
-  Album album = 6;
-  repeated Category categories = 7;
-  Date date = 8;
-}
-message Member {
-  string memberName = 1;
-  string memberEmail = 2;
-
+  string description = 3;
+  int32 price = 4;
+  Album album = 5;
+  Date date = 6;
 }
 message UploadImageRequest{
  Image image = 1;
@@ -65,11 +67,9 @@ message ImageList {
 // Request message for creating a new item listing.
 message AddItemListingRequest {
   string itemName = 1;
-  string memberName = 2;
-  string description = 3;
-  int32 price = 4;
-  Album album = 5;
-  repeated Category categories = 6;
+  string description = 2;
+  int32 price = 3;
+  Album album = 4;
 }
 
 message ListItemListingsRequest  {
@@ -90,4 +90,4 @@ message GetItemListingRequest {
 message ItemListingResponse {
   // The item listing entity (created or retrieved).
   ItemListing itemlisting = 1;
-}
+}

@@ -9,15 +9,6 @@ import java.util.stream.Collectors;
 import static com.google.common.base.Strings.emptyToNull;
 
 public final class ItemListingMapper {
-  private static final Map<CategoryJsonDTO, Category> CATEGORY_TO_PROTO = Map.of(
-      CategoryJsonDTO.CLOTHING, Category.CLOTHING,
-      CategoryJsonDTO.ACCESSORIES, Category.ACCESSORIES,
-      CategoryJsonDTO.CURIOS,   Category.CURIOS);
-
-  private static final Map<Category, CategoryJsonDTO> CATEGORY_FROM_PROTO =
-      CATEGORY_TO_PROTO.entrySet().stream()
-          .collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey));
-
   private static final Map<ImageFileTypeJsonDTO, ImageFileType> FILETYPE_TO_PROTO = new EnumMap<>(Map.of(
       ImageFileTypeJsonDTO.PNG, ImageFileType.PNG,
       ImageFileTypeJsonDTO.JPEG, ImageFileType.JPEG,
@@ -30,10 +21,8 @@ public final class ItemListingMapper {
   public static AddItemListingRequest toRequest(ItemListingJsonDTO dto) {
     AddItemListingRequest.Builder builder = AddItemListingRequest.newBuilder()
         .setItemName(dto.itemName())
-        .setMemberName(dto.memberName())
         .setDescription(dto.description())
-        .setPrice(dto.price())
-        .addAllCategories(toProtoCategories(dto.categories()));
+        .setPrice(dto.price());
 
     if (dto.album() != null) {
       builder.setAlbum(toAlbum(dto.album()));
@@ -41,23 +30,36 @@ public final class ItemListingMapper {
     return builder.build();
   }
   public static ItemListingResponseDTO toResponse(ItemListing item) {
-    Set<CategoryJsonDTO> categories = item.getCategoriesList().stream()
-        .map(CATEGORY_FROM_PROTO::get)
-        .filter(Objects::nonNull)
-        .collect(Collectors.toCollection(LinkedHashSet::new));
-
     return new ItemListingResponseDTO(
         item.getId(),
         item.getItemName(),
-        item.getMemberName(),
         emptyToNull(item.getDescription()),
         item.getPrice(),
-        categories,
         toAlbumResponse(item.getAlbum()),
             item.getDate().getYear(),
             item.getDate().getMonth(),
             item.getDate().getDay());
   }
+  public static ItemSummaryResponseDTO toSummaryResponse(ItemSummary item) {
+    return new ItemSummaryResponseDTO(
+        item.getId(),
+        item.getItemName(),
+        emptyToNull(item.getDescription()),
+        item.getPrice(),
+        item.getDate().getYear(),
+        item.getDate().getMonth(),
+        item.getDate().getDay());
+  }
+
+  public static ThumbnailResponseDTO toThumbnailResponse(ItemThumbnail t) {
+    return new ThumbnailResponseDTO(
+        t.getItemId(),
+        FILETYPE_FROM_PROTO.get(t.getFiletype()),
+        t.getWidth(),
+        t.getHeight(),
+        t.getData().toByteArray());
+  }
+
   private static AlbumResponseDTO toAlbumResponse(Album a) {
     return new AlbumResponseDTO(
         a.getTitle(),
@@ -71,7 +73,7 @@ public final class ItemListingMapper {
         FILETYPE_FROM_PROTO.get(i.getFiletype()),
         i.getWidth(),
         i.getHeight(),
-        i.getData().toByteArray());     // ByteString -> byte[]
+        i.getData().toByteArray());
   }
   private static Album toAlbum(AlbumJsonDTO dto) {
     Album.Builder builder = Album.newBuilder()
@@ -94,10 +96,5 @@ public final class ItemListingMapper {
         .setHeight(dto.height())
         .setData(ByteString.copyFrom(dto.data()))
         .build();
-  }
-  private static List<Category> toProtoCategories(Set<CategoryJsonDTO> categories) {
-    return categories.stream()
-        .map(CATEGORY_TO_PROTO::get)
-        .toList();
   }
 }

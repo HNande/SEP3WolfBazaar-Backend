@@ -9,5 +9,6 @@ import java.util.List;
 
 @Repository
 public interface ItemListingRepository extends JpaRepository<ItemListing, Integer> {
+
   List<ItemListing> findByItemIdGreaterThanOrderByItemIdAsc(int afterId, Pageable pageable);
 }
