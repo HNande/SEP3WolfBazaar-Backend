@@ -1,16 +1,6 @@
 package org.example.data.entities;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "item_picture")
@@ -34,6 +24,9 @@ public class ItemPicture {
   @Column(nullable = false)
   private String filePath;
 
+  @Column(nullable = true)
+  private String thumbnailPath;
+
   protected ItemPicture() {
   }
 
@@ -43,6 +36,13 @@ public class ItemPicture {
     this.filePath = filePath;
   }
 
+  public ItemPicture(String fileName, ImageFileType fileType, String filePath, String thumbnailPath) {
+    this.fileName = fileName;
+    this.fileType = fileType;
+    this.filePath = filePath;
+    this.thumbnailPath = thumbnailPath;
+  }
+
   public int getPictureId() {
     return pictureId;
   }
@@ -50,7 +50,6 @@ public class ItemPicture {
   public ItemListing getItemListing() {
     return itemListing;
   }
-
 
   void setItemListing(ItemListing itemListing) {
     this.itemListing = itemListing;
@@ -78,5 +77,13 @@ public class ItemPicture {
 
   public void setFilePath(String filePath) {
     this.filePath = filePath;
+  }
+
+  public String getThumbnailPath() {
+    return thumbnailPath;
+  }
+
+  public void setThumbnailPath(String thumbnailPath) {
+    this.thumbnailPath = thumbnailPath;
   }
 }
