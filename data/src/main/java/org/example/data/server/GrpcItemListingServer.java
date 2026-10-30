@@ -1,21 +1,19 @@
 package org.example.data.server;
 
-import generated.AddItemListingRequest;
-import generated.GetItemListingRequest;
-import generated.ItemListingResponse;
-import generated.ItemListingServiceGrpc;
-import generated.ListItemListingsRequest;
-import generated.ListItemListingsResponse;
+import generated.*;
 import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 import org.example.data.dao.ItemListingDAO;
+import org.example.data.dao.ItemSummaryDAO;
 import org.example.data.dto.ItemListingResponseDTO;
+import org.example.data.dto.ThumbnailDataDTO;
 import org.example.data.mappers.ItemListingDataMapper;
 import org.example.data.service.DataItemListingService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.grpc.server.service.GrpcService;
 
+import java.util.List;
 import java.util.Optional;
 
 @GrpcService
@@ -30,14 +28,14 @@ public class GrpcItemListingServer extends ItemListingServiceGrpc.ItemListingSer
 
     @Override
     public void addItemListing(AddItemListingRequest request,
-        StreamObserver<ItemListingResponse> responseObserver) {
+                               StreamObserver<ItemListingResponse> responseObserver) {
         try {
             ItemListingResponseDTO created =
-                service.addItem(ItemListingDataMapper.toDomainDTO(request));
+                    service.addItem(ItemListingDataMapper.toDomainDTO(request));
             responseObserver.onNext(ItemListingDataMapper.toResponse(created));
             responseObserver.onCompleted();
             LOG.info("Item listing [ id={}, name={} ] added successfully",
-                created.id(), created.itemName());
+                    created.id(), created.itemName());
         } catch (Exception e) {
             fail(responseObserver, e, "add item listing");
         }
@@ -45,7 +43,7 @@ public class GrpcItemListingServer extends ItemListingServiceGrpc.ItemListingSer
 
     @Override
     public void getItemListing(GetItemListingRequest request,
-        StreamObserver<ItemListingResponse> responseObserver) {
+                               StreamObserver<ItemListingResponse> responseObserver) {
         try {
             Optional<ItemListingResponseDTO> item = service.getItemById(request.getId());
             if (item.isPresent()) {
@@ -53,8 +51,8 @@ public class GrpcItemListingServer extends ItemListingServiceGrpc.ItemListingSer
                 responseObserver.onCompleted();
             } else {
                 responseObserver.onError(Status.NOT_FOUND
-                    .withDescription("Item listing with id " + request.getId() + " not found")
-                    .asRuntimeException());
+                        .withDescription("Item listing with id " + request.getId() + " not found")
+                        .asRuntimeException());
             }
         } catch (Exception e) {
             fail(responseObserver, e, "get item listing");
@@ -63,32 +61,82 @@ public class GrpcItemListingServer extends ItemListingServiceGrpc.ItemListingSer
 
     @Override
     public void listItemListings(ListItemListingsRequest request,
-        StreamObserver<ListItemListingsResponse> responseObserver) {
+                                 StreamObserver<ListItemListingsResponse> responseObserver) {
         try {
             ItemListingDAO.ItemListingPage page =
-                service.getItems(request.getPageSize(), request.getPageToken());
+                    service.getItems(request.getPageSize(), request.getPageToken());
             responseObserver.onNext(ListItemListingsResponse.newBuilder()
-                .addAllItems(page.items().stream()
-                    .map(ItemListingDataMapper::toProtoListing)
-                    .toList())
-                .setNextPageToken(page.nextPageToken())
-                .build());
+                    .addAllItems(page.items().stream()
+                            .map(ItemListingDataMapper::toProtoListing)
+                            .toList())
+                    .setNextPageToken(page.nextPageToken())
+                    .build());
             responseObserver.onCompleted();
         } catch (Exception e) {
             fail(responseObserver, e, "list item listings");
         }
     }
 
+    @Override
+    public void listItemSummaries(ListItemListingsRequest request,
+                                  StreamObserver<ListItemSummariesResponse> responseObserver) {
+        try {
+            ItemSummaryDAO.ItemSummaryPage page = service.getItemSummaries(request.getPageSize(), request.getPageToken());
+
+            ListItemSummariesResponse response = ListItemSummariesResponse.newBuilder()
+                    .addAllItems(page.items().stream()
+                            .map(ItemListingDataMapper::toProtoSummary)
+                            .toList())
+                    .setNextPageToken(page.nextPageToken())
+                    .build();
+
+            responseObserver.onNext(response);
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            fail(responseObserver, e, "list item summaries");
+        }
+    }
+
+    @Override
+    public void getItemThumbnails(GetItemThumbnailsRequest request,
+                                  StreamObserver<GetItemThumbnailsResponse> responseObserver) {
+        try {
+            List<Integer> ids = request.getItemIdsList();
+            List<ThumbnailDataDTO> thumbnails = service.getFirstThumbnails(ids);
+
+            GetItemThumbnailsResponse response = GetItemThumbnailsResponse.newBuilder()
+                    .addAllThumbnails(thumbnails.stream()
+                            .map(ItemListingDataMapper::toProtoThumbnail)
+                            .toList())
+                    .build();
+
+            responseObserver.onNext(response);
+            responseObserver.onCompleted();
+        } catch (Exception e) {
+            fail(responseObserver, e, "get item thumbnails");
+        }
+    }
+
     private void fail(StreamObserver<?> responseObserver, Exception e, String action) {
-        if (e instanceof IllegalArgumentException) {
+        IllegalArgumentException invalid = findIllegalArgument(e);
+        if (invalid != null) {
             responseObserver.onError(Status.INVALID_ARGUMENT
-                .withDescription(e.getMessage())
-                .asRuntimeException());
+                    .withDescription(invalid.getMessage())
+                    .asRuntimeException());
         } else {
             LOG.error("Could not {}", action, e);
             responseObserver.onError(Status.INTERNAL
-                .withDescription("Could not " + action)
-                .asRuntimeException());
+                    .withDescription("Could not " + action)
+                    .asRuntimeException());
         }
+    }
+
+    private static IllegalArgumentException findIllegalArgument(Throwable t) {
+        for (int depth = 0; t != null && depth < 10; depth++, t = t.getCause()) {
+            if (t instanceof IllegalArgumentException iae) {
+                return iae;
+            }
+        }
+        return null;
     }
 }

@@ -3,15 +3,12 @@ package org.example.data.dao;
 import org.example.data.dto.ImageDataDTO;
 import org.example.data.dto.ItemListingDataDTO;
 import org.example.data.dto.ItemListingResponseDTO;
-import org.example.data.entities.Category;
 import org.example.data.entities.ImageFileType;
 import org.example.data.entities.ItemListing;
 import org.example.data.entities.ItemPicture;
-import org.example.data.entities.Member;
 import org.example.data.mappers.ItemListingDataMapper;
-import org.example.data.repository.CategoryRepository;
 import org.example.data.repository.ItemListingRepository;
-import org.example.data.repository.MemberRepository;
+import org.example.util.ImageResizer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Repository;
@@ -33,52 +30,26 @@ import java.util.UUID;
 @Repository
 public class ItemListingDAO {
 
-  //need to lower the DEFAULT_PAGE_SIZE in the ItemDAO in tier 2, as it might be too high and use up all the memory
   private static final int DEFAULT_PAGE_SIZE = 50;
-  private static final int MAX_PAGE_SIZE = 51;
+  private static final int MAX_PAGE_SIZE = 200;
 
   private final ItemListingRepository itemListingRepository;
-  private final MemberRepository memberRepository;
-  private final CategoryRepository categoryRepository;
   private final Path imageDirectory;
 
   public ItemListingDAO(
-      ItemListingRepository itemListingRepository,
-      MemberRepository memberRepository,
-      CategoryRepository categoryRepository,
-      @Value("${wolfbazaar.images.dir:uploads/images}") String imageDirectory) {
+          ItemListingRepository itemListingRepository,
+          @Value("${wolfbazaar.images.dir:uploads/images}") String imageDirectory) {
     this.itemListingRepository = itemListingRepository;
-    this.memberRepository = memberRepository;
-    this.categoryRepository = categoryRepository;
     this.imageDirectory = Path.of(imageDirectory).toAbsolutePath();
   }
 
-  // the database provides the id.
   @Transactional
   public ItemListingResponseDTO addNewItemListing(ItemListingDataDTO dto) {
-
-    // The Member entity identifies members by email - why not fullName?
-
-    String email = dto.memberName().trim().toLowerCase(Locale.ROOT);
-    Member member = memberRepository.findByEmail(email)
-        .orElseThrow(() -> new IllegalArgumentException("Unknown member: " + email));
-
     ItemListing listing = new ItemListing();
-    listing.setMember(member);
     listing.setItemName(dto.itemName());
     listing.setDescription(dto.description());
     listing.setPrice(dto.price());
     listing.setListDate(LocalDate.now());
-
-    for (var protoCategory : dto.categories()) {
-      String name = protoCategory.toString();
-      if (name.equals("UNRECOGNIZED")) {
-        throw new IllegalArgumentException("Unknown category");
-      }
-      Category category = categoryRepository.findByName(name)
-          .orElseGet(() -> categoryRepository.save(new Category(name)));
-      listing.addCategory(category);
-    }
 
     Map<Path, byte[]> filesToWrite = new LinkedHashMap<>();
     if (dto.album() != null && dto.album().images() != null) {
@@ -88,8 +59,18 @@ public class ItemListingDAO {
         }
         ImageFileType type = toFileType(image.filetype());
         Path target = imageDirectory.resolve(UUID.randomUUID() + extensionOf(type));
-        listing.addPicture(new ItemPicture(image.name(), type, target.toString()));
+
+        ImageResizer.Resized thumb;
+        try {
+          thumb = ImageResizer.fitWithin(image.data(), type.name());
+        } catch (IOException e) {
+          throw new UncheckedIOException("Could not create thumbnail for '" + image.name() + "'", e);
+        }
+        Path thumbTarget = imageDirectory.resolve(UUID.randomUUID() + "_thumb" + extensionOf(type));
+
+        listing.addPicture(new ItemPicture(image.name(), type, target.toString(), thumbTarget.toString()));
         filesToWrite.put(target, image.data());
+        filesToWrite.put(thumbTarget, thumb.bytes());
       }
     }
 
@@ -109,20 +90,18 @@ public class ItemListingDAO {
     int size = pageSize > 0 ? Math.min(pageSize, MAX_PAGE_SIZE) : DEFAULT_PAGE_SIZE;
     int afterId = parseToken(pageToken);
     List<ItemListing> rows = itemListingRepository
-        .findByItemIdGreaterThanOrderByItemIdAsc(afterId, PageRequest.of(0, size + 1));
+            .findByItemIdGreaterThanOrderByItemIdAsc(afterId, PageRequest.of(0, size + 1));
 
     boolean hasMore = rows.size() > size;
     List<ItemListing> pageRows = hasMore ? rows.subList(0, size) : rows;
-    String nextToken =
-        hasMore ? String.valueOf(pageRows.get(pageRows.size() - 1).getItemId()) : "";
+    String nextToken = hasMore ? String.valueOf(pageRows.get(pageRows.size() - 1).getItemId()) : "";
 
     List<ItemListingResponseDTO> items =
-        pageRows.stream().map(ItemListingDataMapper::toResponseDTO).toList();
+            pageRows.stream().map(ItemListingDataMapper::toResponseDTO).toList();
     return new ItemListingPage(items, nextToken);
   }
 
-  public record ItemListingPage(List<ItemListingResponseDTO> items, String nextPageToken) {
-  }
+  public record ItemListingPage(List<ItemListingResponseDTO> items, String nextPageToken) {}
 
   private void writeFiles(Map<Path, byte[]> files) {
     List<Path> written = new ArrayList<>();
@@ -167,8 +146,7 @@ public class ItemListingDAO {
   private static String extensionOf(ImageFileType type) {
     return switch (type) {
       case PNG -> ".png";
-      case JPG -> ".jpg";
-      case JPEG -> ".jpeg";
+      case JPG, JPEG -> ".jpg";
     };
   }
 }
