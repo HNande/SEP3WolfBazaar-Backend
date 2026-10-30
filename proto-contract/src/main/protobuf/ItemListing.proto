@@ -8,8 +8,8 @@ service ItemListingService {
   rpc AddItemListing (AddItemListingRequest) returns (StatusResponse);
   rpc GetItemListing (GetItemListingRequest) returns (ItemListingResponse);
   rpc ListItemListings (GetItemListingListRequest) returns (ListItemListingsResponse);
-  rpc UpdateItemListing (UpdateItemListingRequest) returns (ItemListingResponse);
-  rpc RemoveItemListing (RemoveItemListingRequest) returns (google.protobuf.Empty);
+  rpc UpdateItemListing (UpdateItemListingRequest) returns (StatusResponse);
+  rpc RemoveItemListing (RemoveItemListingRequest) returns (StatusResponse);
 }
 
 service MemberService{
