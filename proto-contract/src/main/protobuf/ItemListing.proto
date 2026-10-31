@@ -1,6 +1,5 @@
 syntax = "proto3";
 import "google/protobuf/timestamp.proto";
-import "google/protobuf/empty.proto";
 option java_multiple_files = true;
 option java_package = "generated";
 
@@ -101,7 +100,7 @@ message Message {
 
 message Conversation {
   int32 id = 1;
-  repeated string participant_ids = 2;
+  repeated int32 participant_ids = 2;
   int32  item_listing_id = 3;
 }
 //---------Rpc Requests and Responses--------
@@ -127,7 +126,7 @@ message AddMemberRequest{
 }
 
 message AddConversationRequest{
-  repeated string participant_ids = 1;
+  repeated int32 participant_ids = 1;
   int32  item_listing_id = 2;
 }
 
