@@ -21,7 +21,11 @@ service MemberService{
 }
 
 service ConversationService{
-
+  rpc AddConversation (AddConversationRequest) returns (google.protobuf.Empty);
+  rpc RemoveConversation (RemoveConversationRequest) returns (google.protobuf.Empty);
+  rpc GetConversationList (ListConversationsRequest) returns (ListConversationsResponse);
+  rpc AddMessage (AddMessageRequest) returns (google.protobuf.Empty);
+  rpc GetMessagesList (ListMessagesRequest) returns (ListMessagesResponse);
 }
 
 //------Section global variables-------
