@@ -7,9 +7,10 @@ option java_package = "generated";
 service ItemListingService {
   rpc AddItemListing (AddItemListingRequest) returns (StatusResponse);
   rpc GetItemListing (GetItemListingRequest) returns (ItemListingResponse);
-  rpc ListItemListings (GetItemListingListRequest) returns (ListItemListingsResponse);
   rpc UpdateItemListing (UpdateItemListingRequest) returns (StatusResponse);
   rpc RemoveItemListing (RemoveItemListingRequest) returns (StatusResponse);
+  rpc ListItemSummaries(GetItemListingListRequest) returns (ListItemSummariesResponse);
+  rpc GetItemThumbnails(GetItemThumbnailListRequest) returns (GetItemThumbnailsResponse);
 }
 
 service MemberService{
@@ -46,17 +47,20 @@ message Date {
   int32 month = 2;
   int32 day = 3;
 }
-
-message Thumbnail{
-  ImageFileType filetype = 1;
-  bytes data = 2;      //200x200 max
+message ItemThumbnail {
+  int32 item_id = 1;
+  ImageFileType filetype = 2;
+  uint32 width = 3;
+  uint32 height = 4;
+  bytes data = 5;
 }
 
-message ItemListingSummary{
+message ItemSummary {
   int32 id = 1;
   string itemName = 2;
-  int32 price = 3;
-  Thumbnail thumbnail = 4;
+  string description = 3;
+  int32 price = 4;
+  Date date = 5;
 }
 
 //-----------Section entities-----------
@@ -133,6 +137,9 @@ message AddMessageRequest{
   string content = 3;
 }
 
+message GetItemThumbnailListRequest {
+  repeated int32 item_ids = 1;
+}
 message GetItemListingListRequest  {
   int32 page_size = 1;
   string page_token = 2;
@@ -195,15 +202,17 @@ message LoginRequest{
   string password = 3;
 }
 
-message ListItemListingsResponse {
-  repeated ItemListingSummary items = 1;
-  string next_page_token = 2;
-}
-
 message ItemListingResponse {
   ItemListing itemlisting = 1;
 }
+message ListItemSummariesResponse {
+  repeated ItemSummary items = 1;
+  string next_page_token = 2;
+}
 
+message GetItemThumbnailsResponse {
+  repeated ItemThumbnail thumbnails = 1;
+}
 //Only used when verifying any upload or registration or creation
 message StatusResponse {
   string response = 1;
